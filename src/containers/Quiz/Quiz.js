@@ -5,12 +5,13 @@ import FinishedQuiz from '../../components/ActiveQuiz/FinishedQuiz/FinishedQuiz'
 
 class Quiz extends Component {
     state = {
-        isFinished: true,
+        results: {}, //для записи ответов в квизе
+        isFinished: false,
         activeQuestion: 0,
         answerState: null,
         quiz: [
             {
-                qestion: 'Какого цвета небо?',
+                question: 'Какого цвета небо?',
                 id: 1,
                 rightAnswerId: 2,
                 answers: [
@@ -22,7 +23,7 @@ class Quiz extends Component {
             },
 
             {
-                qestion: 'Какое у вас сейчас настроение?',
+                question: 'Какое у вас сейчас настроение?',
                 id: 2,
                 rightAnswerId: 1,
                 answers: [
@@ -34,7 +35,7 @@ class Quiz extends Component {
             },
 
             {
-                qestion: 'Сколько приложение было в App store на момент запуска?',
+                question: 'Сколько приложение было в App store на момент запуска?',
                 id: 3,
                 rightAnswerId: 2,
                 answers: [
@@ -46,7 +47,7 @@ class Quiz extends Component {
             },
 
             {
-                qestion: 'Сколько Apple платит в год за рекламу в фильмах и сериалах?',
+                question: 'Сколько Apple платит в год за рекламу в фильмах и сериалах?',
                 id: 4,
                 rightAnswerId: 4,
                 answers: [
@@ -69,11 +70,15 @@ class Quiz extends Component {
         }
 
         const question = this.state.quiz[this.state.activeQuestion]
+        const results = this.state.results
 
         if (question.rightAnswerId === answerId) {
-
+            if(!results[question.id]){
+                results[question.id]='success'
+            }
             this.setState({
-                answerState: { [answerId]: 'success' }
+                answerState: { [answerId]: 'success' },
+                results
             })
 
             const timeout = window.setTimeout(() => {
@@ -82,6 +87,7 @@ class Quiz extends Component {
                         isFinished: true
                     })
                 } else {
+                    
                     this.setState({
                         activeQuestion: this.state.activeQuestion + 1,
                         answerState: null
@@ -93,9 +99,10 @@ class Quiz extends Component {
 
 
         } else {
-
+            results[question.id]='error'
             this.setState({
-                answerState: { [answerId]: 'error' }
+                answerState: { [answerId]: 'error' },
+                results
             })
 
         }
@@ -107,6 +114,15 @@ class Quiz extends Component {
         return this.state.activeQuestion + 1 === this.state.quiz.length
     }
 
+    retryHandler = ()=>{
+        this.setState({
+            activeQuestion:0,
+            answerState:null,
+            isFinished: false,
+            results: {}
+        })
+    }
+
     render() {
         return (
             <div className={classes.Quiz}>
@@ -115,11 +131,13 @@ class Quiz extends Component {
                     {
                         this.state.isFinished
                             ? <FinishedQuiz
-
+                                results={this.state.results}
+                                quiz={this.state.quiz}
+                                onRetry={this.retryHandler}
                             />
                             : <ActiveQuiz
                                 answers={this.state.quiz[this.state.activeQuestion].answers}
-                                qestion={this.state.quiz[this.state.activeQuestion].qestion}
+                                question={this.state.quiz[this.state.activeQuestion].question}
                                 onAnswerClick={this.onAnswerClickHandler}
                                 quizLength={this.state.quiz.length}
                                 answerNumber={this.state.activeQuestion + 1}
