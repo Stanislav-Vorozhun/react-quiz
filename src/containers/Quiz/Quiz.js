@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import classes from './Quiz.module.css';
 import ActiveQuiz from '../../components/ActiveQuiz/ActiveQuiz';
 import FinishedQuiz from '../../components/ActiveQuiz/FinishedQuiz/FinishedQuiz';
+import axios from '../../axios/axios-quiz';
+import Loader from '../../components/ActiveQuiz/UI/Loader/Loader';
 
 class Quiz extends Component {
     state = {
@@ -9,55 +11,8 @@ class Quiz extends Component {
         isFinished: false,
         activeQuestion: 0,
         answerState: null,
-        quiz: [
-            {
-                question: 'Какого цвета небо?',
-                id: 1,
-                rightAnswerId: 2,
-                answers: [
-                    { text: 'Черный', id: 1 },
-                    { text: 'Синий', id: 2 },
-                    { text: 'Красный', id: 3 },
-                    { text: 'Зеленый', id: 4 },
-                ]
-            },
-
-            {
-                question: 'Какое у вас сейчас настроение?',
-                id: 2,
-                rightAnswerId: 1,
-                answers: [
-                    { text: 'Солнечное', id: 1 },
-                    { text: 'Великолепное', id: 2 },
-                    { text: 'Отличное', id: 3 },
-                    { text: 'Замечательное', id: 4 },
-                ]
-            },
-
-            {
-                question: 'Сколько приложение было в App store на момент запуска?',
-                id: 3,
-                rightAnswerId: 2,
-                answers: [
-                    { text: '500', id: 1 },
-                    { text: '666', id: 2 },
-                    { text: '1551', id: 3 },
-                    { text: '1000', id: 4 },
-                ]
-            },
-
-            {
-                question: 'Сколько Apple платит в год за рекламу в фильмах и сериалах?',
-                id: 4,
-                rightAnswerId: 4,
-                answers: [
-                    { text: '500 тыс. евро', id: 1 },
-                    { text: '1 млн долларов', id: 2 },
-                    { text: '2 млн евро', id: 3 },
-                    { text: '0', id: 4 },
-                ]
-            }
-        ]
+        quiz: [],
+        loading: true
     }
 
     onAnswerClickHandler = answerId => {
@@ -73,8 +28,8 @@ class Quiz extends Component {
         const results = this.state.results
 
         if (question.rightAnswerId === answerId) {
-            if(!results[question.id]){
-                results[question.id]='success'
+            if (!results[question.id]) {
+                results[question.id] = 'success'
             }
             this.setState({
                 answerState: { [answerId]: 'success' },
@@ -87,7 +42,7 @@ class Quiz extends Component {
                         isFinished: true
                     })
                 } else {
-                    
+
                     this.setState({
                         activeQuestion: this.state.activeQuestion + 1,
                         answerState: null
@@ -99,7 +54,7 @@ class Quiz extends Component {
 
 
         } else {
-            results[question.id]='error'
+            results[question.id] = 'error'
             this.setState({
                 answerState: { [answerId]: 'error' },
                 results
@@ -114,13 +69,27 @@ class Quiz extends Component {
         return this.state.activeQuestion + 1 === this.state.quiz.length
     }
 
-    retryHandler = ()=>{
+    retryHandler = () => {
         this.setState({
-            activeQuestion:0,
-            answerState:null,
+            activeQuestion: 0,
+            answerState: null,
             isFinished: false,
             results: {}
         })
+    }
+
+    async componentDidMount() {
+        try {
+            const response = await axios.get(`/quizes/${this.props.match.params.id}.json`)
+            const quiz = response.data
+            this.setState({
+                quiz,
+                loading: false
+            })
+        }
+        catch (e) {
+            console.log(e)
+        }
     }
 
     render() {
@@ -128,8 +97,10 @@ class Quiz extends Component {
             <div className={classes.Quiz}>
                 <div className={classes.QuizWrapper}>
                     <h1>Выберите ваш ответ:</h1>
-                    {
-                        this.state.isFinished
+
+                    {this.state.loading
+                        ? <Loader />
+                        : this.state.isFinished
                             ? <FinishedQuiz
                                 results={this.state.results}
                                 quiz={this.state.quiz}
@@ -143,6 +114,7 @@ class Quiz extends Component {
                                 answerNumber={this.state.activeQuestion + 1}
                                 state={this.state.answerState}
                             />
+
                     }
                 </div>
             </div>

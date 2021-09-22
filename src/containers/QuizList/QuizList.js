@@ -1,12 +1,14 @@
 import React, { Component } from "react"
 import { NavLink } from "react-router-dom"
 import classes from './QuizList.module.css'
-import axios from "axios"
+import Loader from "../../components/ActiveQuiz/UI/Loader/Loader"
+import axios from "../../axios/axios-quiz"
 
 export default class QuizList extends Component {
 
     state = {
-        quizes:[]
+        quizes: [],
+        loading: true
     }
 
 
@@ -17,7 +19,7 @@ export default class QuizList extends Component {
                     key={quiz.id}
                 >
                     <NavLink to={'/quiz/' + quiz.id}>
-                         {quiz.name}
+                        {quiz.name}
                     </NavLink>
                 </li>
             )
@@ -26,19 +28,20 @@ export default class QuizList extends Component {
 
     async componentDidMount() {
         try {
-            const response = await axios.get('https://react-quiz-e9d64-default-rtdb.europe-west1.firebasedatabase.app/quizes.json')
+            const response = await axios.get('quizes.json')
             const quizes = []
-            Object.keys(response.data).forEach((key, index)=>{
+            Object.keys(response.data).forEach((key, index) => {
                 quizes.push({
                     id: key,
-                    name: `Тест №${index+1}`
+                    name: `Тест №${index + 1}`
                 })
             })
             this.setState({
-                quizes
+                quizes,
+                loading: false
             })
         }
-        catch(e){
+        catch (e) {
             console.log(e)
         }
     }
@@ -49,9 +52,13 @@ export default class QuizList extends Component {
                 <div>
                     <h1>Список тестов</h1>
 
-                    <ul>
+                    {this.state.loading
+                     ? <Loader /> 
+                     : <ul>
                         {this.renderQuizes()}
-                    </ul>
+                    </ul>}
+
+
                 </div>
             </div>
         )
