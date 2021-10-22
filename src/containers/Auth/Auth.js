@@ -41,7 +41,7 @@ import { auth } from "../../store/actions/auth";
         }
     }
 
-    loginHandler = async () => {
+    loginHandler = () => {
         this.props.auth(
             this.state.formControls.email.value,
             this.state.formControls.password.value,
@@ -54,7 +54,7 @@ import { auth } from "../../store/actions/auth";
         this.props.auth(
             this.state.formControls.email.value,
             this.state.formControls.password.value,
-            true
+            false
         )
     }
 
@@ -160,7 +160,7 @@ import { auth } from "../../store/actions/auth";
 
 function mapDispatchToProps(dispatch) {
     return {
-        auth: (email,password, isLogin) => dispatch(auth(email,password,isLogin))
+        auth: (email, password, isLogin) => dispatch(auth(email, password, isLogin))
     }
 }
 
