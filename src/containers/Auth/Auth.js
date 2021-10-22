@@ -54,7 +54,7 @@ import { auth } from "../../store/actions/auth";
         this.props.auth(
             this.state.formControls.email.value,
             this.state.formControls.password.value,
-            false
+            true
         )
     }
 
