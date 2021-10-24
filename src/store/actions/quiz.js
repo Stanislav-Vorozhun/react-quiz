@@ -101,7 +101,7 @@ export function quizAnswerClick(answerId) {
         const state = getState().quiz
         // фикс бага с двоим кликом по правильному ответу (пропуск вопроса)
         if (state.answerState) {
-            const key = Object.keys(this.state.answerState)[0]
+            const key = Object.keys(state.answerState)[0]
             if (state.answerState[key] === 'success') {
                 return
             }

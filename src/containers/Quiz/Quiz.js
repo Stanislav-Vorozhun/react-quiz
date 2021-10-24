@@ -10,9 +10,9 @@ import { fetchQuizById, quizAnswerClick, retryQuiz } from '../../store/actions/q
 
 class Quiz extends Component {
 
-    isQuizFinished() {
-        return this.state.activeQuestion + 1 === this.state.quiz.length
-    }
+    // isQuizFinished() {
+    //     return this.state.activeQuestion + 1 === this.state.quiz.length
+    // }
 
 
     componentDidMount() {
